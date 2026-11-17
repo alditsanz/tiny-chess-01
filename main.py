@@ -1,4 +1,8 @@
-import zlib,base64
+"""tiny-chess-01: 4KB chess engine (packed).
+Readable source: dev/source.py (6,909 bytes). It is zlib-compressed
+and base85-encoded below (P) to fit the 4,096-byte limit; regenerate
+with dev/pack.py. A corrupt blob exits nonzero, not a traceback."""
+import sys,zlib,base64
 P=(
 "c-plY+j81U@|~~H(L-uvNdyTD4tS`FbK8xNbK4}xdnlDlpb-dkmk8h_`|aC3GZF%mRI*h|BADs!>",
 "F(*<^vFS!CV8nWizGIZ!YFoyvChLVn6`74tyxhjZlSDOFKAM<S^Oo)lej%+B~fplUcY$x>CN4XH=",
@@ -47,4 +51,8 @@ P=(
 "P5Z~RY!-IOUq<=%i&4EfazJ8Z=YdKMi(k<78ith807<N!4q*!}Mu}jwZU6g!bDv!N}CFx57q&|yP",
 "hsUQ7$4QN^Di=Eh0zPmIRq*(W9M*0P^!hJLgQ*7",
 )
-exec(zlib.decompress(base64.b85decode("".join(P))))
+try:
+ src=zlib.decompress(base64.b85decode("".join(P)))
+except Exception as e:
+ sys.exit("tiny-chess-01: corrupt packed engine: "+str(e))
+exec(src)
