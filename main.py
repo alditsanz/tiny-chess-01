@@ -1,58 +1,10 @@
 """tiny-chess-01: 4KB chess engine (packed).
-Readable source: dev/source.py (6,909 bytes). It is zlib-compressed
-and base85-encoded below (P) to fit the 4,096-byte limit; regenerate
-with dev/pack.py. A corrupt blob exits nonzero, not a traceback."""
-import sys,zlib,base64
-P=(
-"c-plY+j81U@|~~H(L-uvNdyTD4tS`FbK8xNbK4}xdnlDlpb-dkmk8h_`|aC3GZF%mRI*h|BADs!>",
-"F(*<^vFS!CV8nWizGIZ!YFoyvChLVn6`74tyxhjZlSDOFKAM<S^Oo)lej%+B~fplUcY$x>CN4XH=",
-"pl5efU$=l3an+ZMF?cVri`_YV|tsX?>=oV_2Pz(Y4{}c8qfvKY^#CwLa0%ji#Qf6vGKga*q^~-dV",
-"0kK}>vOVEUS)nO0|@ot-N_@XwVXR&qC<GjgFJz;6Pa);koX>E${N8HwDKd@_i-f=?Jl^Kcp9FbTs",
-"bjiMx5!v_JXp}I51X7g3Z!YF2|IAI|?t0)H83UNR(58xB7RzVa+!3rK=6RhxAtq=z!Qc$#n-{S{S",
-"f(vL7u3$Cr3d1El0e?7`C6KV$%xyk%P%W6x=Sc#(XVFU4G_Cc960_Si%&uja)&)F01OHzb0O)qL)",
-"+@kU1AzD8Ifuu9f9D2Ft%25hUSZEU5Fl?6(wB67t@VsfI?m{te*HfBh+nVatK~6Y`6tP=Vb02R9+",
-"PZ5?rCQiI>{aZ3&egQQ*GE%3fgILe`S03SoQ^?l$1^<nFE8sS5n1|Jta;`C3|Fb`-oOtnsU^*qp+",
-"}GW;zNe3LTa7-Nbb!K@+R=yJp~w3Z0VAfYeK^xwL|{6rr$Ea3!CTsgW5w)CP4dK}SL|Gzfg1BZr;",
-"jKr$VnIzYMZfI?+URF<ngos<rxJ82Nb5*$6;^&4DJ(oFY$ywE;7x%Aa9EbX6O`n<Vxvj{@AU(L;n",
-"<}cCw+>9K=N0fHYb_%e8(fI*y_)K%=u5eW9)N4q4`@c);{i-zd*c?2zF=hrc68h2w$DlVNI&p+9{",
-"=+B(AwJh)mc(TcubGTI-`Sfq1qBEMi}nX48~AC`K8QlG%%#-gyYQ&hN5G~cu=)_7J~zZem*ETzQB",
-"RV}6r{u)f&lCo15E(yLPySxp3yaIZ5XxPG-a_z{BPyu<=|U>d1>`DPL0Clx+5xqM;SiKpp;lmjg@",
-"{SPuYUv_L(PVQv2y->of&#E0(C<J*wwHweWOHvccWoR}L<ZZO@@-0<ZwV--g+1Jx|!;_lzN|ancS",
-"fM71bo+y`t-JE!P46*$=*Ry*D2ve=^6Qcif7R33(iI^3OBZ5ViQ&uc%E+dq{1>i;dbVpzu`hDYrX",
-"W%kHw#P7MYANL(miUv@Mda^9_uq^GR^uG0*Q3%ZJ1~aR{%x;Xkl5yu}jO~V7>+t6ydQB15z-i7dB",
-"x}oh0u0THyJhup+7JMcZ$N&e{lx+6?g8uG!R)*iWdDkwUL6E-FZ*gPYfe{W>{~hQiRp9w?QwjZs=",
-"<nq)m4~pB^%b64oCPt4^P*ReK~GK%V|<^I>=fc@yh*gsN9jP-8<vnDEO&MqeqrKfPzV)@pz!|Nls",
-"yG^+qu$J9I`VjiFeN9(DsuK$OmC1x-PzjTZ3ZgLqFg2P?<qzYC{X={N{Fg@weza0TW7k|mmAOP73",
-"H$yfr+)9Gg@fciW567<btPxiQ#qj668(Bn-=j_{nrk<7xW#is`h8kC&-0kMDpU)(9p&o*3u*h@M>",
-"yU@-kqoy@V=&aQ|mvA^ONC}NIM2$VnDDj~Idi>aK9hX3KB;P*lzl7uKYy+IP$azW44R5-(+6XoUo",
-"qMfTaA<}a6`&OkiddtR>}WYk9?}1FWx)aMu)@YrP$>8tYe=V6m1y5A1+puU9f7QK<6bhe>|<`2?v",
-"QMwSS0ufmYA6ph0Q4tOKAr?5uoV|k+WTa2NFEsV5<VdT8V%WM_ueuPioW?j_TF<0JkgbIw1#^Mxl",
-"$o=FhsX0XSwxQuj0w=6~Jy@Z<1Q+U$Lfy$v{BG#vXN;5C<E%j+BF2JdJ%uA%}#2YpXcC3dv$niH<",
-";2ND@m(6glc$VSi#sHCqWN=w<rnKoYf_UdNMEZ;V||82DZ<EW#f&Rgxw>YMd;G|3zbLrn}fN1bp`",
-"g}>$((jDwJs;JJn3UczA<0H6l0`Y!w3D;8*$UUU4?g(%jX0U%_#ddTht~KwQeliNfHLh$U#l1g+0",
-"EHCc0f6K2)i8Gh$kUHO#FBOSBF~e&B}y3Nqm;2ZD_Y8eq9=9-J=r}vq*c|~g=nuiH4pVMy{dU!*%",
-"i<oy0pZ8_%NIRw-8+S?eoWc%>@5NT?A^IJ;9F-oo-lN-(n0x;ds7V#WQBM!E9q~Y%z>&iuFA{sP9",
-"6nr^GYX2V2|X)|#Ofa=StGG2a8RxoNO2ATYtgrfa0oU&?4XwfQaI{Pt)^;e#E?WiI#TzmB}={k}i",
-"l4t3!OBGX;T3NqR1eQvKU+H2})GHKx~`^ckhg|}BxZern6tZ(urf>Nl*i(6p<!g9=1AS`G61mB<t",
-"1L9n-F_-2Ms_Nz@*mHC$LlxEmT(onA)wJaii7iPksoSIgymz_h`-6;l7=?8(ABUNUl9LI*M_{fmK",
-"g|$t41E#m3i*NisonntZFx&g^fQJPzSWSPHoGFQu58_E#MbR`Z254wqIo-T!gfZn4PSLq+%%HHC`",
-"DS>r}E<FbY9rMk{BQpzcUJ#EU~iQE<d=d5xL=oP)zM{w_yZaYgd-=><1Z^J<PG}62x&9w~$yrT8Q",
-"_)2TO0q{?MnlV6U4B;L7(ow=%w5Zsq1ZW;wi`qz=6qy`J1SR8;00sLZ-2Z=<sJl;q)w5c;B2(ee?",
-"REDDvx7YM(ZJHALM{~&98!xlj5N{A&EVlWA=MzTK!eO^5NaeQPy<1NbQx;+b-n-gvHu^tr^--nGJ",
-"ro{f3=fM>HUJRirei%pf0e-`iF?o=Gil{>&i{bRfwz2BhVIRCT#}|JdmOyct;C*G8@3`X<>O;$2<",
-"%V00s!K~FHL834FK+9{ValUTh{1@nv?_pZ$BW^jj<`DJWW4z_;mxazJz2}EyA0dTSXv$w^$K_3?Y",
-"~5aQ&82N&Hyl9sH4+uSWb(H|7hUoMVS-v#szXiFD7LTEG4j(k?U$a%`<f(+Zoe#s%}TPH0MgZgc}",
-"Yhkx{>0q+w7(WKHq)?3ra>jCS;%n(_@`ZY<CNEM7+}cS}Yxppt9U$EtXTx#gWPlFv9bZ!-7|chL?",
-"CFPNi%;Z~<XT$0&BYaQIOQ>wmubM@i<wb~A1k8OdXy@r5;aEGl`e&DRaWP{*gO8MI}JoU)H%(27M",
-"w<G=*Gi|&O><@R?#Z*mu%5Tc|613%>+)$pN8Ju>MsvA|lc^l2d*{WWvu%8T0vEl5SIK$QVO%U(w)",
-"m0PJ<Djewf^MF1lX6jA=MSoy>X1=_20;Lb*G!A=V;>gM930<q_C9VTK6mEdBsDyAL{8W358^K@<b",
-"@7Ew{$7~6{hX2qqHEN)@Jc6@fgvJ1#>-?7xb%&#{`Q@v)rXj9jcJ)VK8&cAc-I2TJ<|fmdUya%7w",
-"CSuk$d0f<SW3EtI0lb}lGPT#sP-$#i(Ze}EVM$%hT=Kj!%A*Yx{P`O3blS_`alcNe=6ySoD?+}%Z",
-"P5Z~RY!-IOUq<=%i&4EfazJ8Z=YdKMi(k<78ith807<N!4q*!}Mu}jwZU6g!bDv!N}CFx57q&|yP",
-"hsUQ7$4QN^Di=Eh0zPmIRq*(W9M*0P^!hJLgQ*7",
-)
+Readable source: dev/source.py, compressed + base85.
+Regenerate with dev/pack.py."""
+import sys,lzma,base64
+P="""T>t<81poj4|NsC0{{S?bN@uuIJaga{C5>gIEm~QXCE?m9<4UYE5Hw`7u!wXgaBqdJ*__$3OZxJ{W<46wce8;Ai(p1H94u_~hv&6!9QzKH&|$gNVKT@Tcb*H<Y=U+cE~~uww=0v7de>^SILlDxQkxg}B(2~gizGyx&KdW;!q#~@bxrxE=1hOr%nFvM{QC+S@OkD16gRSo#G#lpl<Zw-3}U&xnlguCnUI$o?5kHHY|LMx0YCtj%`Qo2Y;qgV0J^5y?u<kfQA@V~GBj_tQ#z3LdbkR9`RcF*{H9vu=p^sBdoPHV)lmo?xqFSu1f+1x^x?2H9YH;wZ<X|T#x;Twaa6mpb>?&Nq&)xV?Q>Ba>4lAKjCwTDFA$(ntA$Gi{jh<}_%06uq|Co8az)TI$BoOxpy`|bMCi*2Mn`+2eGoy5p46lHAc#R2&8ZDhVrMlzN%4d^BQ<hFlgVkmm4d&uFrD&D;!WtIjBFGIgwat((L0H)-lFte(`KCj&-Tp}Q4;3cWIZTR@TH&mtb!F%MR`D<Eo`0KTR)wVN+N1=_WXghXlj@ULoMaWIG=V)gy?ww#boDXH)8(lujooldrVC98h(P%jxIRm_RxfUF{n&#TQPSqk%s$iknh0fBLt<R7-Z*vaMa_b^6B%C@Z7e#^vbU=Ys`nYEfa8Ksfw$@55{{hi)VnQq@q_eBOZrwBu=l4Kl_#n&q~)6Gj-96f0pE1>u8~QOPLzM_M4j)-cftp%jMes`74k$qL%YhmmB9>(IZls{x{ArVpX#_8o!uXUVkX3+bEI1oy*50&l0;47B+Wl9L+=Q=Ql3NzDzU}=$*qxoWL{f?*Pg<Jr0wNtBwyH^3_~|+~XeX4IURB2OZN{z6+%hUNAO~B$K$;p+$ejI(+bF?UXo14U?LpEBrIcw(8V7FQO8_ME78d*ki|fX88acpWPJA<t9B%D$J{O;mrl@xxQ|x_4*oAF;NFruo&9se}zdc>*0OZ0~c!zms*YRV`taR<Mq{K&G-U?E#)_Wqq79=Ftf|}Hp=Ts@;l%B>|XYd$dCAx$Ms2q&AS{7`I2d^kt{6$)?`DN&>q(!dWg9~kDD>jp|Ff&BNL}pC(9*TKlk;p+@usqB`MU=Z9h!L+wQh|vP#$EYAg^AApE=1AR&F-hhWXUR<0DplQLK2hkLz98>E3~G{EuwY~PYI-n}${=Rxta0Y2SIHuY^XRyV0oS-3*ETq8Z(a1>To(8czGqe&w1j9?JtKa>N&mF6<V+(sbyRqI|5qxMLElU1PDY2-YgMQld`-Tn=5BU$IR%L=H_<%lEXe(CDywf9dQQFWyT&r#Y=ACg3`FtoPu_EozxQFlR&gi(KfltM_zslVZLCyCizhxK^uBrK8gc34=-AYN)1nfkW+Vc5%f{xylfpPI450}tF($jYO7ouoc6+HFLGvS{gN3|$jEign-Gs5ub0NkE%u$<{K#-a4SEj=23*o}nZi3|w87x9nTL?>n(WP7>)uJpa^ARmfDldyL#7Dalt&V9fOD$xp|2vH}fQ0{3hn7@@rAUV<ayf^B=Q#MQ_j1jI$Lj0cSV7C#zm`R3OuPGGcSo?ROd*gixgzPr|hPDE><!&pmHb#AzME_WTWTO#COcXIDwB~6H8!W}(|htNCS!1aOOtLN6Kb347>Y6D~ajlWB2g^%Qx#f6l>8zP+@lYFGv^7Dd>@nhzXji*oh9o2r}!{R%k3}^mfwkmC`5s<1jYZY?QC_tE5XGn10^rj{DM*hW_NhE{KN>52cc7B9?v<lpCb^1H`5msS9@PB(+f?P$5Cn{Ej%h$!c^U5$`sFLL1q1`c0I3?DJ>7KITBV=A{vspi=Y2qH+GA3}TD9U%ug*}a#-ieWWDrTBx0H@TQTumCh)EJmY!v{x538jL5qT!&N9NAkx?NzHLtvkh*VE)rG$~8Rw!U3t_y_O|H_qT?{E|`N;hzx<ktblHywvn{7YfD8D+B8+NYslsYNml@{MA$SfwyU0SCi=>+AEJ<Ctj-&&7K80`xM}k_ZkD=c)VifBl7wAjE-V3s6JU2p72;sfi`IU^Af4{|Up?tz##k}Udi16X-RGhP;6v{QVM782^)iI17$Wl#fsW_o&Vw37;V6O=Tig4^b;Vg9CM(p;B5|+_?{aJl)cL9mHq&#9L95q5t0nV$r<Bq^97+xTtLL*Y<U99s-*n$UZpQ_AzE^a(Ig$CPMuZ*bf^yV@<R=7R@5{NRp;|z?MKSZ29Us>9-};UpSs5apXK-agE#RXC)GkiEXVtdR^%#nfW<<ODQh}c?#jM~N3T;20b{#xq!rZRPTpACbgp<dS%ps9=M;<`}Sk3?qQ-iG(Go?&5(v!~URYBg+4nB+y?1S+9ne7tHM+w|**kRse7B<6y5UOTrvwI3mDcwCm9{dsm=p<26DY7x*hF!XyuDSxQ>qRTTPp?S6s&4K;?%-%i@D1}HMgbvwsO*6M5Xt%g1iUPgAT*l&E32%;vWa!*KiM;Ej!$wT;sQhpJJ()73s%xr^nvi;Kks8T;^Y;>!(D&a@>%3I6GJ@+hY@K$si!x&ybA#?qOT9=s>+3k!P1ET-^Nx|tFeQTHJt!F0kv}i@vN;^4vHt5ykowBW&0zOdZ%Ze!+3e*0F7W?5xdTz0YXy}b60a;MheZ<tDAH9=jmA?%x%-Yl9eiQSD*dY8QGqVmLf_E1VaLqgw8a;D)=YdR?B4+i<zjxU@`t!pS(lz-yS=Zho^v;X_&I*$#`JygZ>A8jNsCPWG!<#lrHB=FP^l{ddcdX$TI1Ax+MUJ9#WFz0NUi)4%2Wf<x4EJeeHXUvILYMnKmsN&X3U8H<he%SgfpX3ZEz`x4pf1=4}ZLYnH$wctZPATnwE*HkWU8+8sI5!G7M9g$0@?#0~l(4W=m~wM<bEr*Q?2ovqV8vvbui^~tXW66?ZFq!GM#%=Pn(Iwkqi&6?Uvv#KmHb0PDTw8&fZ8ZwOL*e5ZjJ4|?vjqYnTe&y5{e?X@hO-#R4K3i$E2!(p(oNX|q;!j(2sWUAiES#BjG#INHO-HqIJp;Jg$4n!^CNrM~8>$%BQk}G)6d@VLJft25Ms|(bEr|Da`=|ft4qqGtx(m9<=KTDdYczA;)lnpOc4hVl&VVdecHEzb|D2Eblj$2oH;E4(Zz^VOaxQzg^3KWWxb1PhB!aerBcVmxC2&Ma+Oh=0ZbpYzh&)3%&=0?u`^@mps1+oXqxgRk-EYil$f1I~V&s7A#PI%%5~B==qv9|i+ci?0=d_zAcmh8JI+Ckq&1+5mIFt;)J}7`2Y1^$OjXb6E^`h^?pyz~@gR?4gtbeAz>LC%_Af#OoY_WH+w8Z}9FaN!zUdI"""
 try:
- src=zlib.decompress(base64.b85decode("".join(P)))
+ src=lzma.decompress(base64.b85decode(P))
 except Exception as e:
  sys.exit("tiny-chess-01: corrupt packed engine: "+str(e))
 exec(src)
